@@ -97,7 +97,8 @@ def main():
         print("=> creating model '{}'".format(args.arch))
         model = models.__dict__[args.arch]()
 
-    if args.gpu is not None:
+    if args.gpu is not None: 
+        #case when gpu device id is specified (using specific gpu on one machine)
         model = model.cuda(args.gpu)
     elif args.distributed:
         model.cuda()

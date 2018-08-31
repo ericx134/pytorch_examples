@@ -9,23 +9,28 @@ from torchvision import datasets, transforms
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
+        #torch.nn.Conv2d(in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, bias=True)
         self.conv1 = nn.Conv2d(1, 10, kernel_size=5)
         self.conv2 = nn.Conv2d(10, 20, kernel_size=5)
+        #torch.nn.Dropout2d(p=0.5, inplace=False): randomly zero out whole channel of input features per example
         self.conv2_drop = nn.Dropout2d()
         self.fc1 = nn.Linear(320, 50)
         self.fc2 = nn.Linear(50, 10)
 
     def forward(self, x):
+        #torch.nn.functional.max_pool2d(input, kernel_size, stride=None, padding=0, dilation=1, ceil_mode=False, return_indices=False)
+        #default stride_size is same as kernel_size
         x = F.relu(F.max_pool2d(self.conv1(x), 2))
         x = F.relu(F.max_pool2d(self.conv2_drop(self.conv2(x)), 2))
         x = x.view(-1, 320)
         x = F.relu(self.fc1(x))
         x = F.dropout(x, training=self.training)
         x = self.fc2(x)
+        #log_softmax first calculate softmax to get probabilities p, then take log: log(p) for use in later loss function
         return F.log_softmax(x, dim=1)
 
 def train(args, model, device, train_loader, optimizer, epoch):
-    model.train()
+    model.train() #sets module/model in training mode.
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
@@ -42,7 +47,7 @@ def test(args, model, device, test_loader):
     model.eval()
     test_loss = 0
     correct = 0
-    with torch.no_grad():
+    with torch.no_grad(): 
         for data, target in test_loader:
             data, target = data.to(device), target.to(device)
             output = model(data)
