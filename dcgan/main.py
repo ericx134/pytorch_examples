@@ -215,7 +215,7 @@ for epoch in range(opt.niter):
         output = netD(fake.detach())
         errD_fake = criterion(output, label)
         errD_fake.backward()
-        D_G_z1 = output.mean().item()
+        D_G_z1 = output.mean().item() #this is averaged probability D(G(z))
         errD = errD_real + errD_fake
         optimizerD.step()
 

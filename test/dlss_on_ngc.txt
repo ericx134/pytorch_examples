@@ -1,0 +1,106 @@
+1. Install NGC CLI on your local machine: 
+https://docs.google.com/document/d/1kDdYTrEfhmpvTFCAtfw_Ad-KPHSoTv34PaLqL21Tipc/edit#heading=h.jcqb71ewi9ip
+
+Note: To use 'workspace' feature, ensure your CLI version is at least 0.8.0 (latest 0.10.0)
+Note: Make sure to set your context properly with the command below; generate your NGC API key on https://ngc.nvidia.com/configuration
+    $ ngc context set --apikey <Your_NGC_API_key> --org nvidian --team dt --ace nv-us-west-2
+
+
+
+2. Enable 'workspace', a read/write/shareable scratch space with mountable volumes in NGC Batch:
+
+Note: Workspace is not enabled by default; enable it with an environment variable NGC_CLI_WORKSPACE exported:
+Note: These export commands have to be executed on each terminal session
+
+On Linux/Mac 
+$ export NGC_CLI_WORKSPACE=1
+# check whether workspace is enabled
+$ ngc workspace -h
+ 
+ 
+On Windows  
+$ setx NGC_CLI_WORKSPACE 1
+# check whether workspace is enabled
+$ ngc workspace -h
+
+
+
+3. Create, Mount and Use 'workspace':
+
+# Create workspace
+$ ngc workspace create      
+Successfully created workspace with id: 48MLCYJ8Q--miAvxntJ_Fg
+
+# Name the workspace (so you don't have to refer to it by id)
+$ ngc workspace set 48MLCYJ8Q--miAvxntJ_Fg --name <workspace_name>
+
+# Mount workspace to local machine
+$ ngc workspace mount <workspace_id|workspace_name> <local_mount_path>     
+Mounting complete.
+
+# Copy data to your local mount point (can be pretty slow...)
+......
+
+# Using workspace in a job
+$ ngc batch run ... --workspace <workspace_id|workspace_name>:<mountpoint> ...
+
+
+
+For more workspace commands, refer to the official user guide: 
+https://docs.google.com/document/d/1kDdYTrEfhmpvTFCAtfw_Ad-KPHSoTv34PaLqL21Tipc/edit#heading=h.h6pscyo3cosm
+
+
+4. Copy container image over to NGC from SaturnV:
+
+Note: The image is already on NGC so you don't need to do this again
+
+# login to SaturnV registry
+$ docker login nvcr.io
+Username: $oauthtoken
+Password: <Your SaturnV API Key>
+
+# pull the docker image down
+$ docker pull nvcr.io/nvidian_general/dlaa-pytorch:pth040_cuda9010_py36_apex_gputil
+
+# retag the image in ngc's 'org/team/image:tag' format
+$ docker tag nvcr.io/nvidian_general/dlaa-pytorch:pth040_cuda9010_py36_apex_gputil nvcr.io/nvidian/dt/dlaa-pytorch:pth040_cuda9010_py36_apex_gputil
+
+# logout docker from SaturnV and login to NGC
+$ docker logout nvcr.io
+$ docker login nvcr.io
+Username $oauthtoken
+Password: <Your NGC API Key>
+
+# push the retagged image up to NGC
+docker push nvcr.io/nvidian/dt/dlaa-pytorch:pth040_cuda9010_py36_apex_gputil
+
+
+
+5. Launching a DLSS training job on NGC
+
+
+See 'launch_ngc_job.sh' for an example job using 8 GPUs.
+
+Note: Currently there is a workspace named 'ericx-dlaa' shared across nvidian/dt
+with the dlaa-pytorch code at /code/dlaa-pytorch-master
+
+# Get a workspace's info
+$ ngc workspace get ericx-dlaa
+----------------------------------------------------
+  Workspace Information
+    ID: Yndc1n4wRv-o_4hnjdEGsA
+    Name: ericx-dlaa
+    ACE: nv-us-west-2
+    Org: nvidian
+    Description: None
+    Shared with: nvidian/dt
+----------------------------------------------------
+
+
+
+
+
+
+
+
+
