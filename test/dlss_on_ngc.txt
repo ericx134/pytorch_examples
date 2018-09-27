@@ -81,8 +81,8 @@ docker push nvcr.io/nvidian/dt/dlaa-pytorch:pth040_cuda9010_py36_apex_gputil
 
 See 'launch_ngc_job.sh' for an example job using 8 GPUs.
 
-Note: Currently there is a workspace named 'ericx-dlaa' shared across nvidian/dt
-with the dlaa-pytorch code at /code/dlaa-pytorch-master
+Note: Currently there is a workspace named 'ericx-dlaa' visible across nvidian/dt
+with the dlaa-pytorch repo at /code/dlaa-pytorch-master
 
 # Get a workspace's info
 $ ngc workspace get ericx-dlaa
